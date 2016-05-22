@@ -1,0 +1,51 @@
+<!--
+Goal of this extension: To use external defined modules and create parameteric box...
+
+Main contents:
+    1. One XML file with one ACT object to create tree object.
+    2. One Python file collecting the user inputs and printing it to extension log file.
+
+Documentation References:
+    1. XML Tags > geomtery, XML Tags > extension, XML Tags > script, XML Tags > interface, XML Tags > toolbar & XML Tags > entry in HTML Reference's guide
+	2. XML Tags > simdata, XML Tags > geometry, XML Tags > propertygroup & XML Tags > property in HTML Reference's guide
+	3. API's Discription > IDesignMOdelerDataModel > GeometryBuilder in HTML Reference's guide
+
+Usage instructions:
+    1. Copy this XML and the folder (DMExample3) to %appdata%\Ansys\v145\AdvancedAddinPackage\extension.
+    2. Open the Workbench R15.
+    3. Turn on the Beta options under Tools >> Options >> Appearance
+	4. Load the extension
+    5. Open DesignModeler and use the extension.
+-->
+
+<extension version="1" name="RotorMagnets">
+	
+	<guid shortid="RMag_Extension">DF4A9B5E-82F1-41E7-B670-7FB72705DC9A</guid>
+	
+	<script src="RotorMagnets.py" />
+	
+	<interface context="DesignModeler">
+		<images>icons</images>
+		<toolbar name="RMag_Extension" caption="RMag Extension">
+			<entry name="RMag"  icon="RotorMagnetsIcon">
+			<callbacks>
+				<onclick>createMyFeature</onclick>
+			</callbacks>
+			</entry>
+		</toolbar>
+	</interface>
+
+	<simdata context="DesignModeler">
+		<geometry name="RMagFeature" caption="RMag" icon="RotorMagnetsIcon" version="1">
+			<callbacks>
+				<ongenerate>generateRMagGeometry</ongenerate>
+			</callbacks>
+			<!-- property Length can be defined as WB parameter here by adding attribute isparameter -->
+			<property name="De" caption="D external" unit="Length" control="float" default="50 [m]" ></property>
+			<property name="Di" caption="D internal" unit="Length" control="float" default="30 [m]" ></property> 
+			<property name="Thickness" caption="Thickness" unit="Length" control="float" default="5 [m]" isparameter="true"></property>
+			<property name="Count" caption="Count" control="integer" default="8" ></property>	
+		</geometry>
+	</simdata>
+
+</extension>
