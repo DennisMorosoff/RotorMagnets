@@ -18,7 +18,7 @@ Usage instructions:
     5. Open DesignModeler and use the extension.
 -->
 
-<extension version="1" name="RotorMagnets">
+<extension version="2" name="RotorMagnets">
 	
 	<guid shortid="RMag_Extension">DF4A9B5E-82F1-41E7-B670-7FB72705DC9A</guid>
 	
@@ -36,15 +36,15 @@ Usage instructions:
 	</interface>
 
 	<simdata context="DesignModeler">
-		<geometry name="RMagFeature" caption="RMag" icon="RotorMagnetsIcon" version="1">
+		<geometry name="RMagFeature" caption="Creating permanent magnets" icon="RotorMagnetsIcon" version="1">
 			<callbacks>
 				<ongenerate>generateRMagGeometry</ongenerate>
 			</callbacks>
 			<!-- property Length can be defined as WB parameter here by adding attribute isparameter -->
 			<property name="De" caption="D external" unit="Length" control="float" default="50 [m]" ></property>
 			<property name="Di" caption="D internal" unit="Length" control="float" default="30 [m]" ></property> 
-			<property name="Thickness" caption="Thickness" unit="Length" control="float" default="5 [m]" isparameter="true"></property>
-			<property name="Count" caption="Count" control="integer" default="8" ></property>	
+			<property name="Thickness" caption="Thickness" unit="Length" control="float" default="5 [m]" isparameter="true" ></property>
+			<property name="Count" caption="Count" control="integer" default="8" ><attributes min="3" /></property>	
 		</geometry>
 	</simdata>
 
