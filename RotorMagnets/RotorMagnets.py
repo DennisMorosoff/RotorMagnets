@@ -9,7 +9,7 @@ def createMyFeature(ag):
 def generateRMagGeometry(feature,fct):
     ExtAPI.Log.WriteMessage("Generating Rotor Magnets...")
     
-
+    
     # Collect all property values in meter unit
     fromUnit, toUnit = ExtAPI.DataModel.CurrentUnitFromQuantityName("Length"), "m"
     
@@ -25,14 +25,14 @@ def generateRMagGeometry(feature,fct):
     ExtAPI.Log.WriteMessage("Count: "+Count.ToString())
     
     bodies=[]
-
+    
     alfa = pi/8
-
+    
     # xde = (De/2*sin(pi/(Count)))
     # yde = De/2*cos(pi/(Count)) 
     # xdi = Di/2*tan(pi/(Count)) 
     # ydi = Di/2 
-
+    
     x0e_ = -De/2*sin(pi/Count)
     y0e_ = De/2*cos(pi/Count)  
     
@@ -50,7 +50,9 @@ def generateRMagGeometry(feature,fct):
     ExtAPI.Log.WriteMessage("point2 x: " + x2i_.ToString() + "  y: " + y3i_.ToString())
     ExtAPI.Log.WriteMessage("point3 x: " + x3i_.ToString() + "  y: " + y3i_.ToString())
     
-   
+    # get access to engineering data
+    #engineering_data = ExtAPI.DataModel.Project.EngineeringDataLibrary
+    
     for i in range(0, Count, 1):
         #i = j + 1
         
@@ -76,7 +78,7 @@ def generateRMagGeometry(feature,fct):
         
         ExtAPI.Log.WriteMessage("")
         
-    
+        
         try:
             #Creating Trapeze
             
@@ -102,11 +104,58 @@ def generateRMagGeometry(feature,fct):
             bodies.Add(extrude.ApplyTo(trapeze_generated)[0])
             
             
-            
         except:
             pass
-        
+    
     feature.Bodies = bodies
     feature.MaterialType = MaterialTypeEnum.Freeze
-
+    
     return True
+
+
+def afterGenerateRMagGeometry(feature):
+    ExtAPI.Log.WriteMessage("After generating Rotor Magnets...")
+    
+    # Check for "Magnets" named selection
+    if not featureByName("Magnets"):
+        ExtAPI.SelectionManager.NewSelection(feature.Bodies)
+        feaMagnets = ExtAPI.DataModel.FeatureManager.CreateNamedSelection()
+        feaMagnets.Name = "Magnets"
+        ExtAPI.SelectionManager.ClearSelection()
+    
+    # Check for "Fixed" named selection
+    if not featureByName("Fixed"):
+        faces = []
+        for body in feature.Bodies:
+            for face in body.Faces:
+                if face.Centroid[1] == 0.0 and face.NormalAtParam(0.0,0.0)[1] == 1.0:
+                    faces.Add(face)
+    
+        ExtAPI.SelectionManager.NewSelection(faces)
+        feaFixed = ExtAPI.DataModel.FeatureManager.CreateNamedSelection()
+        feaFixed.Name = "Fixed"
+        ExtAPI.SelectionManager.ClearSelection()
+    
+    # Check for "Force" named selection
+    if not featureByName("Force"):
+        faces = []
+        for body in feature.Bodies:
+            for face in body.Faces:
+                if face.Centroid[1] != 0.0 and face.NormalAtParam(0.0,0.0)[1] == 1.0:
+                    faces.Add(face)
+    
+        ExtAPI.SelectionManager.NewSelection(faces)
+        feaForce = ExtAPI.DataModel.FeatureManager.CreateNamedSelection()
+        feaForce.Name = "Force"
+        ExtAPI.SelectionManager.ClearSelection()
+    
+    if str(feature.Bodies[0].BodyType) == "GeoBodySolid":    
+        feature.Properties["Volume"].Value = feature.Bodies[0].Volume    
+    
+    return True
+
+def featureByName(name):
+    for fea in ExtAPI.DataModel.FeatureManager:
+        if fea.Name == name:
+            return fea
+    return False
